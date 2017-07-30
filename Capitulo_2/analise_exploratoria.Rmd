@@ -1,0 +1,64 @@
+---
+title: "Capítulo 2 - Análise Exploratória"
+author: "Pedro Martins"
+date: "30 de julho de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Análise exploratória**
+
+Serão carregadas bases com quantidades de vendas de dois cardápios:  
+- Cardápio promocional;  
+- Cardápio regular.
+
+```{r, echo = FALSE, message = FALSE}
+library(readr)
+promocional <- data.frame(read_csv(file = "cardapio_promocional.csv"))
+regular <- data.frame(read_csv(file = "cardapio_regular.csv"))
+
+coef_disp <- function(dados){
+  desvio <- sd(dados)
+  media <- mean(dados)
+  desvio / media
+}
+moda <- function(dados) {
+  tabela <- table(as.vector(dados))
+  names(tabela)[tabela == max(tabela)]
+}
+```
+
+####**Médias:**  
+- Cardápio promocional: `r mean(promocional$Quantidade)`   
+- Cardápio regular: `r mean(regular$Quantidade)`
+
+####**Medianas:**  
+- Cardápio promocional: `r median(promocional$Quantidade)`   
+- Cardápio regular: `r median(regular$Quantidade)`
+
+####**Modas:**  
+- Cardápio promocional: `r moda(promocional$Quantidade)`   
+- Cardápio regular: `r moda(regular$Quantidade)`
+
+####**Valores mínimos:**  
+- Cardápio promocional: `r min(promocional$Quantidade)`   
+- Cardápio regular: `r min(regular$Quantidade)`
+
+####**Valores máximos:**  
+- Cardápio promocional: `r max(promocional$Quantidade)`   
+- Cardápio regular: `r max(regular$Quantidade)`
+
+####**Variâncias:**  
+- Cardápio promocional: `r var(promocional$Quantidade)`   
+- Cardápio regular: `r var(regular$Quantidade)`
+
+####**Desvios padrões:**  
+- Cardápio promocional: `r sd(promocional$Quantidade, TRUE)`   
+- Cardápio regular: `r sd(regular$Quantidade, TRUE)`
+
+####**Coeficientes de dispersão:**  
+- Cardápio promocional: `r coef_disp(promocional$Quantidade)`   
+- Cardápio regular: `r coef_disp(regular$Quantidade)`
