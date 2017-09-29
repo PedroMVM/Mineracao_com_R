@@ -1,0 +1,12 @@
+ID;Idade;Salário;Formação;Carga horária;Qtde pratos;Vinhos;Capacidade;Localização;Tipo cardápio;Lucratividade;Saldo
+1;45;7000;Superior;8.0;15;Não;100;Portuário;Mediterrâneo;30000;+
+2;48;30000;Pós-graduação;8.0;25;Sim;100;Portuário;Espanhol;150000;+
+3;31;7500;Superior;8.0;10;Não;70;Centro;Oriental;-15000;-
+4;40;8000;Médio;6.0;15;Não;80;Aeroportuário;Argentino;50000;+
+5;25;8000;Superior;6.0;18;Não;300;Rodoviário;Carnes;70000;+
+6;75;;Superior;6.0;23;Não;150;Centro;Italiano;50000;+
+7;43;15000;Pós-graduação;8.0;20;Sim;100;Bairro;Francês;70000;+
+8;29;7000;Médio;8.0;13;Sim;35;Centro;Argentino;30000;+
+9;50;8500;Superior;;12;Sim;50;Bairro;Mexicano;-2000;-
+10;51;15000;Superior;6.0;16;Não;1;Bairro;Internacional;10000;+
+11;39;3000;Médio;4.0;10;Não;50;Zona rural;Regional;10000;+

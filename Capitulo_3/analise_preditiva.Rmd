@@ -1,0 +1,39 @@
+---
+title: "Análise preditiva"
+author: "Pedro Martins"
+date: "22 de agosto de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Análise Preditiva
+
+## Gerando o gráfico de satisfação
+```{r}
+satisfacao <- read.csv2("satisfacao.csv", sep = ";", header = TRUE)
+avaliacao <- as.factor(c("SAT", "INS"))
+avaliacao <- lvls_reorder(avaliacao, c(2, 1))
+
+ggplot(data = satisfacao) + 
+  geom_point(aes(x = Tempo, y = Preco, color = satisfacao$Classe)) +
+  labs(x = "Tempo", y = "Preço") +
+  scale_color_manual(values = c("SAT" = "#0F7F1F", "INS" = "#FF0000")) +
+  geom_text(aes(x = Tempo + 0.025, y = Preco + 0.03, label = satisfacao$RID)) +
+#  geom_abline(intercept = 1, slope = -1, color = "red") +
+#  scale_x_continuous(breaks = seq(0, 0.2, 1)) + 
+#  scale_y_continuous(breaks = seq(0, 0.2, 1)) + 
+  theme_bw()
+```
+
+## Usando o algoritmo kNN
+
+```{r}
+treinamento <- satisfacao[2:12, 2:3]
+rotulos <- satisfacao[2:12, 4:4]
+teste <- satisfacao[1:1, 2:3]
+estimado <- knn(treinamento, teste, rotulos)
+```
+

@@ -1,0 +1,71 @@
+---
+title: "Exercícios do capítulo 2"
+author: "Pedro Martins"
+date: "22 de agosto de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercícios
+
+1. O conjunto de dados da Tabela 2-19, chamado **fidelização**, trata de uma tentativa de obter dados das visitas dos clientes ao restaurante com o propósito de descobrir se existem fatores que contribuem para um cliente se fidelizar ao estabelecimento ou não. Os atributos descritivos de cada situação dizem respeito a diferentes tipos de avaliação realizados em uma visita ao restaurante.
+```{r}
+fidelizacao <- read.csv2("fidelizacao.csv", header = TRUE, sep = ";")
+```
+
+a) Realize uma análise exploratória dos dados de forma a verificar se conclusões sobre fidelização podem ser tiradas a partir desta análise. Em sua análise, verifique se as medidas de posição e separatrizes, medidas de dispersão, projete gráficos do tipo histograma e **boxplot** e realize análise de correlação.
+```{r}
+fidelizacao <- read.csv2("fidelizacao.csv", header = TRUE, sep = ";")
+#str(fidelizacao)
+fidelizacao$Avaliacao1[fidelizacao$Avaliacao1 == "??"] <- NA
+fidelizacao$Avaliacao2[fidelizacao$Avaliacao2 == "??"] <- NA
+fidelizacao$Avaliacao3[fidelizacao$Avaliacao3 == "??"] <- NA
+#str(fidelizacao)
+fidelizacao$Avaliacao1 <- as.numeric(sub(",", ".", fidelizacao$Avaliacao1))
+fidelizacao$Avaliacao2 <- as.numeric(sub(",", ".", fidelizacao$Avaliacao2))
+fidelizacao$Avaliacao3 <- as.numeric(sub(",", ".", fidelizacao$Avaliacao3))
+
+media1 <- mean(fidelizacao$Avaliacao1, na.rm = TRUE)
+media2 <- mean(fidelizacao$Avaliacao2, na.rm = TRUE)
+media3 <- mean(fidelizacao$Avaliacao3, na.rm = TRUE)
+mediana1 <- median(fidelizacao$Avaliacao1, na.rm = TRUE)
+mediana2 <- median(fidelizacao$Avaliacao2, na.rm = TRUE)
+mediana3 <- median(fidelizacao$Avaliacao3, na.rm = TRUE)
+```
+
+b) Supondo que tarefas de mineração de dados precisam ser resolvidas sobre esse conjunto de dados, discorra sobre a necessidade de executar procedimentos de pré-processamento.
+
+
+c) Prepare um programa em R que apresente as medidas e gráficos obtidos na análise exploratória e um novo conjunto de dados (pré-processado) mais adequado para ser minerado.
+
+
+
+2. Este problema consiste no reconhecimento dos dígitos manuscritos (Kayanak, 1995), o qual é parte de um estudo maior, envolvendo imagens como dados de entrada. Cada imagem de dígito tem um tamanho padronizado, com dimensão de 32 x 32 pixels, totalizando um conjunto com 43 * 10 exemplares (distribuídos em conjuntos para treinamento e para teste). Considere ainda que a imagem é um mapa de bits, cada bit é um pixel da imagem valorado com zero (0) ou um (1), sendo que 1 significa que o pixel faz parte do traçado do dígito manuscrito. Adicionalmente, existe um segundo conjunto de dados, pré-processado, no qual as imagens originais foram representadas por imagens menores, de dimensão 8 x 8 pixels. Para conseguir a representação compacta, foi feita uma transformação sobre janelas de 4 x 4 pixels da imagem original. Cada uma das janelas de tamanho 4 foram transformadas em um único pixel, cujo valor é a contagem dos pixels valorados com 1 na janela. Assim, para cobrir cada imagem de 32 x 32 pixels, foram necessárias 8 janelas de 4 x 4, o que gerou a representação na dimensão 8 x 8. Por fim, a matriz resultante é transformada em um vetor com 64 elementos(R^64^), em que cada elemento é um inteiro em [0, 16]. A figura 2.11 ilustra o processo de transformação. No conjunto de dados, o atributo de rótulo é adicionado à representação vetorial.
+
+a) Para cada um dos dígitos, considerando o conjunto de dados pré-processado, realize (usando R) uma análise exploratória de cada um dos atributos - inclua gráficos **boxplot** em suas análises.
+
+b) O pré-processamento com redução da quantidade de pixels é uma das possíveis estratégias para criar uma representação das imagens. Outra representação poderia ser feita com o uso de histogramas. Faça uma amostragem para cada um dos 10 dígitos e apresente o histograma. Discuta se essa representação poderia ser usada em um processo de mineração de dados realizado sobre esse conjunto de dados.
+
+
+3. Para um projeto de mineração de dados, encomendado por uma instituição de ensino, considere que foi disponibilizado um conjunto de dados com os textos referentes às ementas das disciplinas. Os textos já passaram pelo processo de preparação, que envolve análise lexical, eliminação de termos irrelevantes e redução do termo ao seu radical. Os documentos textuais (ementa de cada disciplina) estão representados por simplificações: os termos estão representados pelas letras **A** e **B**, da seguinte forma:
+
+*Disciplina 1:* **A A A B**
+*Disciplina 2:* **A A B**
+*Disciplina 3:* **A A**
+*Disciplina 4:* **B B**
+
+A tarefa restante agora é a criação das representações vetoriais: binária, **tf**, **Tf-idf** e **tf-idf** normalizado.
+
+4. O **corpus** apresentado a seguir consiste em oito trechos de músicas populares nacionais. O objetivo aqui é realizar alguma tarefa de mineração de dados sobre essas músicas. Porém, o **corpus** não está representado como um conjunto de dados. Sua tarefa é prepará-lo de forma que um algoritmo de mineração de dados possa ser executado. Ao final do processo, quatro representações vetoriais são esperadas como conjuntos de dados: **tf**, **tf-idf** e **tf-idf** normalizado.
+
+**L1:** "... O teu amor pode estar... Do seu lado..."
+**L2:** "... Eu quero amar você, e quando amanhecer eu quero acordar do seu lado."
+**L3:** "Você abusou, tirou partido de mim, abusou"
+**L4:** "Meu partido é um coração partido"
+**L5:** "O nosso amor a gente inventa... pra se distrair"
+**L6:** "Grande pátria desimportante... Em nenhum instante... Eu vou te trair"
+**L7:** "Eu sou... Eu sou a pátria que lhe esqueceu"
+**L8:** "E o que dizem que foi tudo por causa de um coração partido"

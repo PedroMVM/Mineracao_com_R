@@ -20,14 +20,22 @@ library(readr)
 promocional <- data.frame(read_csv(file = "cardapio_promocional.csv"))
 regular <- data.frame(read_csv(file = "cardapio_regular.csv"))
 
+variancia <- function(dados){
+  return(sum((dados - mean(dados)) ^ 2)/length(dados))
+}
+
+desvio_padrao <- function(dados){
+  return(sqrt(sum((dados - mean(dados)) ^ 2)/length(dados)))
+}
+
 coef_disp <- function(dados){
-  desvio <- sd(dados)
+  desvio <- sqrt(sum((dados - mean(dados)) ^ 2)/length(dados))
   media <- mean(dados)
-  desvio / media
+  return(desvio / media)
 }
 moda <- function(dados) {
   tabela <- table(as.vector(dados))
-  names(tabela)[tabela == max(tabela)]
+  return(names(tabela)[tabela == max(tabela)])
 }
 ```
 
@@ -52,13 +60,134 @@ moda <- function(dados) {
 - Cardápio regular: `r max(regular$Quantidade)`
 
 ####**Variâncias:**  
-- Cardápio promocional: `r var(promocional$Quantidade)`   
-- Cardápio regular: `r var(regular$Quantidade)`
+- Cardápio promocional: `r variancia(promocional$Quantidade)`   
+- Cardápio regular: `r variancia(regular$Quantidade)`
 
 ####**Desvios padrões:**  
-- Cardápio promocional: `r sd(promocional$Quantidade, TRUE)`   
-- Cardápio regular: `r sd(regular$Quantidade, TRUE)`
+- Cardápio promocional: `r desvio_padrao(promocional$Quantidade)`   
+- Cardápio regular: `r desvio_padrao(regular$Quantidade)`
 
 ####**Coeficientes de dispersão:**  
 - Cardápio promocional: `r coef_disp(promocional$Quantidade)`   
 - Cardápio regular: `r coef_disp(regular$Quantidade)`
+
+```{r, echo = FALSE, message = FALSE}
+correl_pearson <- function(vetor1, vetor2){
+  resultado <- sum((vetor1 - mean(vetor1)) * (vetor2 - mean(vetor2))) / 
+    (sqrt(sum((vetor1 - mean(vetor1)) ^ 2)) * sqrt(sum((vetor2 - mean(vetor2)) ^ 2)))
+  return(resultado)
+}
+feijoada <- c(24, 27, 29, 30, 32, 58, 64, 64, 65)
+caipirinha <- c(10, 25, 20, 36, 28, 38, 50, 60, 69)
+```
+##### O *coeficiente de correlação Pearson* entre feijoada e caipirinha para os vetores informados é *`r cor(x = feijoada, y = caipirinha, method = "pearson")`*.
+
+# **Gráficos**
+
+```{r, echo = FALSE, message = FALSE}
+library(forcats)
+meses <- c("Nov", "Dez", "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul")
+dados <- data.frame(as_factor(meses))
+names(dados) <- c("Meses")
+dados$Feijoada <- feijoada
+dados$Caipirinha <- caipirinha
+library(ggplot2)
+library(dplyr)
+ggplot() +
+  geom_point(aes(x = dados$Meses, y = dados$Feijoada), color = "dark red", shape = 16) +
+
+  geom_point(aes(x = dados$Meses, y = dados$Caipirinha), color = "dark green", shape = 15) +
+  labs(x = "Meses", y = "Vendas") +
+  scale_y_continuous(limits = c(0, 80), breaks = seq(0, 80, 10)) +
+  theme_bw()
+```
+
+# Exemplo de pré-processamento de dados  
+Será carregada uma base de dados provenientes de entrevistas com chefs de restaurantes. Os nomes das colunas serão renomeadas para não ter acentos e espaços. Será feito também o tratamento de valores faltantes (NA).
+```{r, echo = FALSE}
+print("Carregando a base de dados chefs")
+chefs <- read.csv(file = "Chefs.csv", header = TRUE, sep = ";")
+# Renomeando colunas para remover os acentos
+names(chefs)[3] <- "Salario"
+names(chefs)[4] <- "Formacao"
+names(chefs)[5] <- "Carga_horaria"
+names(chefs)[6] <- "Qtde_pratos"
+names(chefs)[9] <- "Localizacao"
+names(chefs)[10] <- "Tipo_cardapio"
+
+print("Arrumando valores inconsistentes da base chefs...")
+# median e mean retornam NA quando existe algum valor NA na entrada.
+# É preciso colocar o atributo na.rm = TRUE para ignorar esses valores
+# e resultar em um número
+
+# Trocando NA pela mediana dos salários
+chefs$Salario[is.na(chefs$Salario)] <- median(chefs$Salario, na.rm = TRUE)
+# Trocando NA pela média da carga horária
+chefs$Carga_horaria[is.na(chefs$Carga_horaria)] <- mean(chefs$Carga_horaria, na.rm = TRUE)
+# Trocando valor muito alto pela média
+chefs$Lucratividade[chefs$Lucratividade > 100000] <- mean(chefs$Lucratividade[chefs$Lucratividade <= 100000])
+# Trocando valor inconsistente pela mediana da capacidade
+chefs$Capacidade[chefs$Capacidade < 10] <- median(chefs$Capacidade[chefs$Capacidade >= 10])
+# Ordenando categorias
+print("Ordenando variáveis categóricas")
+ordered(chefs$Formacao, c("Nenhuma", "Fundamental", "Médio", "Superior", "Pós-graduação"))
+# Verificando o coeficiente de correlação Pearson entre a lucratividade e o saldo
+# Primeiro cria-se uma versão numérica para o saldo
+saldo <- c(rep(0, 11))
+saldo[chefs$Saldo == "+"] <- +1
+saldo[chefs$Saldo == "-"] <- -1
+# Cria-se uma versão da lucratividade apenas com os sinais
+lucratividade <- sign(chefs$Lucratividade)
+# Conferindo o coeficiente Pearson, se for 1 remove a coluna Saldo
+if (cor(saldo, lucratividade) == 1){
+# Removendo a coluna Saldo
+  print("Removendo coluna redundante")
+  chefs <- chefs[-12]
+}
+remove(lucratividade, saldo)
+# Criando matrizes para transformar valores categóricos em numéricos
+print("Transformando categorias em números")
+linhas <- as.numeric(max(row(chefs)))
+# Formação
+formacao <- matrix(rep(0, linhas), nrow = linhas, ncol = 1)
+formacao[chefs$Formacao == "Nenhuma"] <- 1
+formacao[chefs$Formacao == "Fundamental"] <- 2
+formacao[chefs$Formacao == "Médio"] <- 3
+formacao[chefs$Formacao == "Superior"] <- 4
+formacao[chefs$Formacao == "Pós-graduação"] <- 5
+# Vinhos
+vinhos <- matrix(rep(0, linhas), nrow = linhas, ncol = 1)
+vinhos[chefs$Vinhos == "Sim"] <- 1
+# Localização
+localizacao <- matrix(rep(0, linhas * 6), nrow = linhas, ncol = 6)
+localizacao[chefs$Localizacao == "Aeroportuário", 1] <- 1
+localizacao[chefs$Localizacao == "Bairro", 2] <- 1
+localizacao[chefs$Localizacao == "Centro", 3] <- 1
+localizacao[chefs$Localizacao == "Portuário", 4] <- 1
+localizacao[chefs$Localizacao == "Rodoviário", 5] <- 1
+localizacao[chefs$Localizacao == "Zona rural", 6] <- 1
+# Cardápio
+cardapio <- matrix(rep(0, linhas * 12), nrow = linhas, ncol = 12)
+cardapio[chefs$Tipo_cardapio == "Argentino", 1] <- 1
+cardapio[chefs$Tipo_cardapio == "Carnes", 2] <- 1
+cardapio[chefs$Tipo_cardapio == "Espanhol", 3] <- 1
+cardapio[chefs$Tipo_cardapio == "Francês", 4] <- 1
+cardapio[chefs$Tipo_cardapio == "Internacional", 5] <- 1
+cardapio[chefs$Tipo_cardapio == "Italiano", 6] <- 1
+cardapio[chefs$Tipo_cardapio == "Mediterrâneo", 7] <- 1
+cardapio[chefs$Tipo_cardapio == "Mexicano", 8] <- 1
+cardapio[chefs$Tipo_cardapio == "Oriental", 9] <- 1
+cardapio[chefs$Tipo_cardapio == "Pizza", 10] <- 1
+cardapio[chefs$Tipo_cardapio == "Português", 11] <- 1
+cardapio[chefs$Tipo_cardapio == "Regional", 12] <- 1
+chefs_novo <- as.data.frame(cbind(chefs$Idade, chefs$Salario, formacao, chefs$Carga_horaria, chefs$Qtde_pratos, vinhos, chefs$Capacidade, localizacao, cardapio, chefs$Lucratividade))
+names(chefs_novo) <- c("Idade", "Salario", "Formacao", "Carga_horaria", "Qtde_pratos", "Vinhos", "Capacidade", "Aeroportuario", "Bairro", "Centro", "Portuario", "Rodoviario", "Zona_rural", "Argentino", "Carnes", "Espanhol", "Frances", "Internacional", "Italiano", "Mediterraneo", "Mexicano", "Oriental", "Pizza", "Portugues", "Regional", "Lucratividade")
+print("Processo finalizado")
+```  
+Gerando a função Min-Max para análise de atributos
+```{r, echo = FALSE}
+min.max <- function(vetor, min, max){
+  return((vetor - min) / (max(vetor) - min(vetor)) * (max - min) + min)
+}
+```
+
