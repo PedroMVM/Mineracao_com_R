@@ -7,3 +7,6 @@ library(stringr)
 library(tidyr)
 library(tidyverse)
 print("Importação concluída!")
+
+# Instalar os seguintes pacotes:
+# assertthat, BH, broom, cellranger, colorspace, curl, DBI, dichromat, digest, dplyr, forcats, foreign, ggplot2, gtable, haven, hms, httr, jsonlite, labeling, lattice, lazyeval, lubridate, magrittr, MASS, mime, mnormt, modelr, munsell, nlme, openssl, plyr, psych, purrr, R6, RColorBrewer, Rcpp, readr, readxl, rematch, reshape2, rvest, scales, selectr, stringi, stringr, tibble, tidyr, tidyverse, xml2
