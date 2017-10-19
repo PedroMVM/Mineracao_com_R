@@ -22,18 +22,40 @@ ggplot(data = satisfacao) +
   labs(x = "Tempo", y = "Preço") +
   scale_color_manual(values = c("SAT" = "#0F7F1F", "INS" = "#FF0000")) +
   geom_text(aes(x = Tempo + 0.025, y = Preco + 0.03, label = satisfacao$RID)) +
-#  geom_abline(intercept = 1, slope = -1, color = "red") +
-#  scale_x_continuous(breaks = seq(0, 0.2, 1)) + 
-#  scale_y_continuous(breaks = seq(0, 0.2, 1)) + 
   theme_bw()
 ```
 
 ## Usando o algoritmo kNN
 
 ```{r}
+library(class)
 treinamento <- satisfacao[2:12, 2:3]
 rotulos <- satisfacao[2:12, 4:4]
 teste <- satisfacao[1:1, 2:3]
 estimado <- knn(treinamento, teste, rotulos)
+```
+
+## Usando uma rede neural artificial
+
+```{r}
+library("RSNNS")
+X <- satisfacao[2:3]
+Y <- decodeClassLabels(satisfacao[,4])
+satisfacao_separada <- splitForTrainingAndTest(X, Y, ratio = 0.10)
+satisfacao_normalizada <- normTrainingAndTestSet(satisfacao_separada, dontNormTargets = TRUE, type = "0_1")
+modelo_mlp <- mlp(satisfacao_separada$inputsTrain, satisfacao_separada$targetsTrain, size = c(3), maxit = 5000, initFunc = "Randomize_Weights", 
+                  learnFunc = "Std_Backpropagation", learnFuncParams = c(0.1), hiddenActFunc = "Act_Logistic", shufflePatterns = TRUE, linOut = TRUE,
+                  inputsTest = satisfacao_separada$inputsTest, targetsTest = satisfacao_separada$targetsTest)
+
+```
+
+## Gerando gráfico da curva de aprendizagem
+
+```{r}
+plot(modelo_mlp$IterativeFitError, type = 'n', main = "Curva de Aprendizagem", xlab = "Iteração", ylab = "Erro médio quadrado", cex.lab = 1.5, ylim = c(0, 10))
+lines(modelo_mlp$IterativeFitError, col = '1', lwd = 3, cex = 2)
+lines(modelo_mlp$IterativeTestError, col = '2', lwd = 3)
+legend(locator(1), c("Treinamento", "Teste"), lty = c(1, 1), col = c(1, 2))
+
 ```
 
