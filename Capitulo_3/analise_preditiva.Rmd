@@ -55,7 +55,6 @@ modelo_mlp <- mlp(satisfacao_separada$inputsTrain, satisfacao_separada$targetsTr
 plot(modelo_mlp$IterativeFitError, type = 'n', main = "Curva de Aprendizagem", xlab = "Iteração", ylab = "Erro médio quadrado", cex.lab = 1.5, ylim = c(0, 10))
 lines(modelo_mlp$IterativeFitError, col = '1', lwd = 3, cex = 2)
 lines(modelo_mlp$IterativeTestError, col = '2', lwd = 3)
-legend(locator(1), c("Treinamento", "Teste"), lty = c(1, 1), col = c(1, 2))
 
 ```
 
